@@ -1,0 +1,74 @@
+def module = ""
+def image = ""
+def scmURL = ""
+def application_group=""
+node('docker'){
+
+  cleanWs()
+  checkout scm
+
+  def build = load 'track/vars/Build.groovy'
+
+  def env = sh (returnStdout: true, script: "echo ${ENV_TYPE}|tr '[:upper:]' '[:lower:]'").trim()
+  print env
+
+  def nodeport = ""
+
+  if (  == "" ){
+      nodeport = ""
+      print nodeport
+  } else if ( == "" ){
+      nodeport = ""
+      print nodeport
+  }
+
+  version = VersionNumber([
+        versionNumberString :'0.${BUILD_NUMBER}',
+        versionPrefix : 'v1.'
+    ])
+    currentBuild.displayName = "${version}"
+    print version
+
+
+  stage('Code Checkout'){
+    build.codeCheckout(BRANCHNAME, module, scmURL)
+  }
+
+  stage('Code Quality'){
+    def mavenSonarVariables = ""
+    //build.codeChecksOnJava11(module, mavenSonarVariables)
+    build.codeChecks(module, mavenSonarVariables)
+    //build.codeQualityStatus()
+  }
+
+  stage('Build Image'){
+    def dockerFilePath = "${WORKSPACE}/${module}"
+    build.imageBuild(module, version, dockerFilePath, env)
+  }
+
+   stage('Build Dependent Image'){
+    def dockerFilePath = "${WORKSPACE}/${module}/clamav"
+    build.dependentImageBuild(image, version, dockerFilePath)
+  }
+
+
+  stage('Push Image'){
+     build.publishImage(module, version, env)
+  }
+
+  stage('Push dependent Image'){
+     build.publishDependentImage(image, version)
+  }
+
+
+  stage('Container Deployment'){
+    def scriptDir = "${WORKSPACE}/Track2/SamScan"
+    sh "mkdir -p ${scriptDir}/${BANK}"
+    sh "cp "
+    sh "cp "
+    sh """ansible-playbook ${scriptDir}/k8s_templates.yml -e''"""
+    build.containerDeployment(scriptDir, module, version, env)
+  }
+
+}
+

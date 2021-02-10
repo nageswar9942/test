@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{env}}-track2-{{module}}
+spec:
+  selector:
+    app: {{env}}-track2-{{env}}
+  ports:
+    - protocol: "TCP"
+      port: 
+      targetPort: 
+      nodePort: {{nodeport}}
+  type: NodePort
+

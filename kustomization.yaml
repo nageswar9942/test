@@ -1,0 +1,26 @@
+kind: Kustomization
+namespace : {{env}}-{{BANK}}-{{application_group}}
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+- files:
+  - ./property file
+  name: 
+- files:
+  - ./clamd.conf
+  - ./freshclam.conf
+  name: clamav-config
+commonLabels:
+  app: {{env}}-track2-{{module}}
+resources:
+- namespace.yaml
+- serviceAccount.yaml
+- role.yaml
+- roleBinding.yaml
+- deployment.yml
+- serviceNodePort.yml
+images:
+- name: image
+  newName: image
+  newTag: 1.0.0
+

@@ -1,0 +1,13 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{env}}-track2-{{module}}-role-binding
+subjects:
+- kind: ServiceAccount
+  name: {{env}}-track2-{{module}}
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: {{env}}-{{BANK}}-{{module}}-role
+  apiGroup: ""
+

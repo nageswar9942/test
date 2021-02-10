@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{env}}-track2-{{module}}
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{env}}-track2-{{module}}
+  template:
+    metadata:
+      labels:
+        app: {{env}}-track2-{{module}}
+    spec:
+      containers:
+      - image: image:IMAGE-TAG-FROM-PIPELINE
+        imagePullPolicy: Always
+        name:  {{env}}-track2-{{module}}
+        command: ["sh"]
+        args: ["-c", "exec java -jar "]
+        ports:
+        - containerPort: 
+        volumeMounts:
+          - name: config-volume-env
+            mountPath: 
+
+      - image: image:{{version}}
+        imagePullPolicy: Always
+        name: {{env}}-track2-clamav
+        ports:
+        - containerPort: 
+        volumeMounts:
+          - name: config-volume-clamav
+            mountPath: 
+
+      volumes:
+      - name:
+        configMap:
+          name: samscan-env
+      - name: 
+        configMap:
+          name: clamav-config
+      serviceAccountName: {{env}}-track2-{{module}}
+
